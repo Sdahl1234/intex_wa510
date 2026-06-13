@@ -6,7 +6,7 @@ from homeassistant.components.number import NumberEntity, NumberMode
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, DEVICE_NAME, DEVICE_MANUFACTURER, DEVICE_MODEL, DEVICE_SW_VERSION
 
 
 @dataclass(frozen=True)
@@ -56,9 +56,10 @@ class IntexWA510Number(CoordinatorEntity, NumberEntity):
         self._attr_entity_category = desc.entity_category
         self._attr_device_info = {
             "identifiers": {(DOMAIN, entry.data["device_id"])},
-            "name": "Piscine",
-            "manufacturer": "Intex / AGP / Tuya",
-            "model": "WA510 / AGP SMART SENSOR T3U",
+            "name": DEVICE_NAME,
+            "manufacturer": DEVICE_MANUFACTURER,
+            "model": DEVICE_MODEL,
+            "sw_version": DEVICE_SW_VERSION,
         }
 
     @property

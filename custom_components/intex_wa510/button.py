@@ -7,7 +7,7 @@ from homeassistant.components.button import ButtonEntity
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, DEVICE_NAME, DEVICE_MANUFACTURER, DEVICE_MODEL, DEVICE_SW_VERSION
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -54,9 +54,10 @@ class IntexWA510Button(CoordinatorEntity, ButtonEntity):
         self._attr_entity_category = desc.entity_category
         self._attr_device_info = {
             "identifiers": {(DOMAIN, entry.data["device_id"])},
-            "name": "Piscine",
-            "manufacturer": "Intex / AGP / Tuya",
-            "model": "WA510 / AGP SMART SENSOR T3U",
+            "name": DEVICE_NAME,
+            "manufacturer": DEVICE_MANUFACTURER,
+            "model": DEVICE_MODEL,
+            "sw_version": DEVICE_SW_VERSION,
         }
 
     async def async_press(self) -> None:

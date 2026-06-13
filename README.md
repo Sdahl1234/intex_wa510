@@ -43,12 +43,14 @@ Home Assistant custom integration for the **Intex WA510 / AGP SMART SENSOR T3U**
 - Configurable calibration intervals
 - Calibration completed buttons
 
-### Diagnostics
+### Device presentation
 
-- Last real measurement timestamp
-- Maintenance status
-- Sensor indicators
-- Calibration status
+- Device name: **Analyseur Piscine**
+- Manufacturer: **Intex / AGP / Tuya**
+- Model: **WA510 / AGP SMART SENSOR T3U**
+- Logo and icon files included in the repository and integration folder
+
+> Note: Home Assistant may still show `icon not available` for custom integrations unless the integration is included in the official Home Assistant Brands repository. This does not affect the integration.
 
 ---
 
@@ -87,81 +89,21 @@ https://openapi.tuyaeu.com
 
 ---
 
-## Supported device
-
-### Intex WA510
-
-Also sold as:
-
-- AGP SMART SENSOR T3U
-
----
-
-## Entities
-
-### Main sensors
-
-- pH
-- ORP
-- Water temperature
-- Free chlorine
-- Corrected free chlorine
-- Battery level
-
-### Binary sensors
-
-- Maintenance required
-- Cleaning required
-- pH calibration required
-- ORP calibration required
-- Low battery
-
-### Number entities
-
-- pH setpoint
-- ORP setpoint
-- Cleaning interval
-- pH calibration interval
-- ORP calibration interval
-
-### Buttons
-
-- Refresh measurement
-- Cleaning completed
-- pH calibration completed
-- ORP calibration completed
-
-### Diagnostic entities
-
-- Last real measurement timestamp
-- Error code
-- Maintenance status
-- pH indicator
-- ORP indicator
-- Chlorine indicator
-- Calibration status
-
----
-
-## Important notes
-
-The calibration command buttons exposed by Tuya are experimental.
-
-Do not launch a calibration unless you are actually performing the official calibration procedure described in the Intex documentation.
-
-This project is experimental and is not affiliated with Intex, AGP, Tuya, or Home Assistant.
-
----
-
 ## Changelog
+
+### v0.6.1
+
+Presentation release:
+- device is now named **Analyseur Piscine**
+- device information uses a consistent manufacturer/model/software version
+- logo.png and icon.png are included at repository root and inside the integration folder
+- README keeps the HACS-compatible raw GitHub logo URL
+- manifest version set to 0.6.1
 
 ### v0.6.0
 
 Clean public release:
 - clean GitHub / HACS package structure
 - manifest version set to 0.6.0
-- README image uses GitHub raw URL for HACS
-- logo.png and icon.png included at repository root and in the integration folder
 - maintenance and calibration entities kept from v0.5.x
 - duplicated unavailable setpoint / threshold sensors removed
-- Tuya `off` indicator values translated to clearer statuses
