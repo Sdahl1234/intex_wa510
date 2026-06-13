@@ -4,8 +4,8 @@
   "codeowners": [],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/example/intex_wa510",
+  "documentation": "https://github.com/Yeoh37/intex_wa510",
   "iot_class": "cloud_polling",
   "requirements": [],
-  "version": "0.5.1"
+  "version": "0.5.2"
 }
