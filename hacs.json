@@ -1,0 +1,12 @@
+{
+  "name": "Intex WA510 Water Analyzer",
+  "render_readme": true,
+  "homeassistant": "2024.1.0",
+  "domains": [
+    "sensor",
+    "binary_sensor",
+    "button",
+    "number"
+  ],
+  "iot_class": "Cloud Polling"
+}

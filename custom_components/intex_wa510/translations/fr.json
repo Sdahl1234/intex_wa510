@@ -1,0 +1,16 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Intex WA510 Water Analyzer",
+        "description": "Renseignez les identifiants Tuya Cloud.",
+        "data": {
+          "access_id": "Access ID / Client ID",
+          "access_secret": "Access Secret",
+          "device_id": "Device ID",
+          "endpoint": "Endpoint Tuya"
+        }
+      }
+    }
+  }
+}
