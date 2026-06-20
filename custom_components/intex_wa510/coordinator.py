@@ -1,12 +1,14 @@
-from __future__ import annotations
+"""Data coordinator for the Intex WA510 integration."""
 
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 import logging
 
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.util import dt as dt_util
 
 from .const import (
     CONF_ACCESS_ID,
@@ -30,7 +32,8 @@ _LOGGER = logging.getLogger(__name__)
 class IntexWA510Coordinator(DataUpdateCoordinator):
     """Fetch Intex WA510 data from Tuya Cloud and store maintenance dates."""
 
-    def __init__(self, hass: HomeAssistant, entry) -> None:
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+        """Initialize the coordinator and persistent maintenance store."""
         self.entry = entry
         self.client = TuyaCloudClient(
             async_get_clientsession(hass),
@@ -59,6 +62,7 @@ class IntexWA510Coordinator(DataUpdateCoordinator):
         )
 
     async def async_load_maintenance_data(self) -> None:
+        """Load persisted maintenance data from storage."""
         stored = await self._store.async_load()
         if isinstance(stored, dict):
             self.maintenance_data.update(stored)
@@ -120,15 +124,17 @@ class IntexWA510Coordinator(DataUpdateCoordinator):
         }
 
     async def async_mark_maintenance_done(self, key: str | None) -> None:
+        """Mark a maintenance task as completed today."""
         if key is None:
             return
-        self.maintenance_data[key] = date.today().isoformat()
+        self.maintenance_data[key] = dt_util.now().date().isoformat()
         await self._store.async_save(self.maintenance_data)
         await self.async_request_refresh()
 
     async def async_set_maintenance_threshold(
         self, key: str | None, value: float
     ) -> None:
+        """Persist a maintenance threshold value and refresh entities."""
         if key is None:
             return
         self.maintenance_data[key] = int(value)
@@ -151,6 +157,7 @@ class IntexWA510Coordinator(DataUpdateCoordinator):
         )
 
     def days_since(self, key: str) -> int | None:
+        """Return days elapsed since a stored maintenance date."""
         value = self.maintenance_data.get(key)
         if not value:
             return None
@@ -158,9 +165,10 @@ class IntexWA510Coordinator(DataUpdateCoordinator):
             stored_date = datetime.fromisoformat(str(value)).date()
         except ValueError:
             return None
-        return (date.today() - stored_date).days
+        return (dt_util.now().date() - stored_date).days
 
     def get_int(self, key: str, default: int) -> int:
+        """Return an integer threshold from storage or a default value."""
         value = self.maintenance_data.get(key)
         try:
             return int(value)

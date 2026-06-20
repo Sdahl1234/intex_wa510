@@ -1,3 +1,5 @@
+"""Constants for the Intex WA510 custom integration."""
+
 DOMAIN = "intex_wa510"
 
 CONF_ACCESS_ID = "access_id"

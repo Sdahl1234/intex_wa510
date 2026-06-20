@@ -1,27 +1,33 @@
-from __future__ import annotations
+"""Sensor entities for the Intex WA510 integration."""
 
 from dataclasses import dataclass
 
 from homeassistant.components.sensor import (
-    SensorEntity,
     SensorDeviceClass,
+    SensorEntity,
     SensorStateClass,
 )
-from homeassistant.const import UnitOfTemperature, PERCENTAGE
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import PERCENTAGE, UnitOfTemperature
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
-    DOMAIN,
-    DEVICE_NAME,
     DEVICE_MANUFACTURER,
     DEVICE_MODEL,
+    DEVICE_NAME,
     DEVICE_SW_VERSION,
+    DOMAIN,
 )
+from .coordinator import IntexWA510Coordinator
 
 
 @dataclass(frozen=True)
 class SensorDef:
+    """Describe a WA510 sensor entity."""
+
     key: str
     translation_key: str
     suggested_object_id: str
@@ -224,7 +230,10 @@ SENSORS = [
 ]
 
 
-async def async_setup_entry(hass, entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+) -> None:
+    """Set up WA510 sensors from a config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_entities(
         [IntexWA510Sensor(coordinator, entry, desc) for desc in SENSORS], True
@@ -232,7 +241,12 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 
 class IntexWA510Sensor(CoordinatorEntity, SensorEntity):
-    def __init__(self, coordinator, entry, desc: SensorDef):
+    """WA510 sensor entity."""
+
+    def __init__(
+        self, coordinator: IntexWA510Coordinator, entry: ConfigEntry, desc: SensorDef
+    ) -> None:
+        """Initialize the sensor entity."""
         super().__init__(coordinator)
         self.desc = desc
         self._attr_unique_id = f"{entry.entry_id}_{desc.key}"
@@ -254,6 +268,7 @@ class IntexWA510Sensor(CoordinatorEntity, SensorEntity):
 
     @property
     def native_value(self):
+        """Return the current native value from coordinator data."""
         if not self.coordinator.data:
             return None
         return self.coordinator.data.get(self.desc.key)

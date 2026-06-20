@@ -1,22 +1,28 @@
-from __future__ import annotations
+"""Number entities for the Intex WA510 integration."""
 
 from dataclasses import dataclass
 
 from homeassistant.components.number import NumberEntity, NumberMode
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
-    DOMAIN,
-    DEVICE_NAME,
     DEVICE_MANUFACTURER,
     DEVICE_MODEL,
+    DEVICE_NAME,
     DEVICE_SW_VERSION,
+    DOMAIN,
 )
+from .coordinator import IntexWA510Coordinator
 
 
 @dataclass(frozen=True)
 class NumberDef:
+    """Describe a WA510 number entity."""
+
     key: str
     translation_key: str
     suggested_object_id: str
@@ -95,7 +101,10 @@ NUMBERS = [
 ]
 
 
-async def async_setup_entry(hass, entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+) -> None:
+    """Set up WA510 number entities from a config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_entities(
         [IntexWA510Number(coordinator, entry, desc) for desc in NUMBERS], True
@@ -103,7 +112,12 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 
 class IntexWA510Number(CoordinatorEntity, NumberEntity):
-    def __init__(self, coordinator, entry, desc: NumberDef):
+    """WA510 number entity."""
+
+    def __init__(
+        self, coordinator: IntexWA510Coordinator, entry: ConfigEntry, desc: NumberDef
+    ) -> None:
+        """Initialize the number entity."""
         super().__init__(coordinator)
         self.desc = desc
         self._attr_unique_id = f"{entry.entry_id}_{desc.key}_number"
@@ -127,11 +141,13 @@ class IntexWA510Number(CoordinatorEntity, NumberEntity):
 
     @property
     def native_value(self):
+        """Return the current native value from coordinator data."""
         if not self.coordinator.data:
             return None
         return self.coordinator.data.get(self.desc.key)
 
     async def async_set_native_value(self, value: float) -> None:
+        """Set the native value on the device or in local storage."""
         if self.desc.action_type == "storage":
             await self.coordinator.async_set_maintenance_threshold(
                 self.desc.storage_key, value

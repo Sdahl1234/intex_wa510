@@ -1,21 +1,27 @@
-from __future__ import annotations
+"""Binary sensors for the Intex WA510 integration."""
 
 from dataclasses import dataclass
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
-    DOMAIN,
-    DEVICE_NAME,
     DEVICE_MANUFACTURER,
     DEVICE_MODEL,
+    DEVICE_NAME,
     DEVICE_SW_VERSION,
+    DOMAIN,
 )
+from .coordinator import IntexWA510Coordinator
 
 
 @dataclass(frozen=True)
 class BinarySensorDef:
+    """Describe a WA510 binary sensor entity."""
+
     key: str
     translation_key: str
     suggested_object_id: str
@@ -53,7 +59,10 @@ BINARY_SENSORS = [
 ]
 
 
-async def async_setup_entry(hass, entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+) -> None:
+    """Set up WA510 binary sensors from a config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_entities(
         [IntexWA510BinarySensor(coordinator, entry, desc) for desc in BINARY_SENSORS],
@@ -62,7 +71,15 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 
 class IntexWA510BinarySensor(CoordinatorEntity, BinarySensorEntity):
-    def __init__(self, coordinator, entry, desc: BinarySensorDef):
+    """WA510 binary sensor entity."""
+
+    def __init__(
+        self,
+        coordinator: IntexWA510Coordinator,
+        entry: ConfigEntry,
+        desc: BinarySensorDef,
+    ) -> None:
+        """Initialize the binary sensor entity."""
         super().__init__(coordinator)
         self.desc = desc
         self._attr_unique_id = f"{entry.entry_id}_{desc.key}"
@@ -79,7 +96,8 @@ class IntexWA510BinarySensor(CoordinatorEntity, BinarySensorEntity):
         }
 
     @property
-    def is_on(self):
+    def is_on(self) -> bool | None:
+        """Return whether the binary sensor is currently on."""
         if not self.coordinator.data:
             return None
 

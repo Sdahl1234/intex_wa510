@@ -1,25 +1,31 @@
-from __future__ import annotations
+"""Button entities for the Intex WA510 integration."""
 
 from dataclasses import dataclass
 import logging
 
 from homeassistant.components.button import ButtonEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
-    DOMAIN,
-    DEVICE_NAME,
     DEVICE_MANUFACTURER,
     DEVICE_MODEL,
+    DEVICE_NAME,
     DEVICE_SW_VERSION,
+    DOMAIN,
 )
+from .coordinator import IntexWA510Coordinator
 
 _LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
 class ButtonDef:
+    """Describe a WA510 button entity."""
+
     key: str
     translation_key: str
     suggested_object_id: str
@@ -113,7 +119,10 @@ BUTTONS = [
 ]
 
 
-async def async_setup_entry(hass, entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+) -> None:
+    """Set up WA510 buttons from a config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_entities(
         [IntexWA510Button(coordinator, entry, desc) for desc in BUTTONS], True
@@ -121,7 +130,12 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 
 class IntexWA510Button(CoordinatorEntity, ButtonEntity):
-    def __init__(self, coordinator, entry, desc: ButtonDef):
+    """WA510 button entity."""
+
+    def __init__(
+        self, coordinator: IntexWA510Coordinator, entry: ConfigEntry, desc: ButtonDef
+    ) -> None:
+        """Initialize the button entity."""
         super().__init__(coordinator)
         self.desc = desc
         self._attr_unique_id = f"{entry.entry_id}_{desc.key}"
@@ -139,6 +153,7 @@ class IntexWA510Button(CoordinatorEntity, ButtonEntity):
         }
 
     async def async_press(self) -> None:
+        """Handle button press actions."""
         _LOGGER.info("WA510 BUTTON PRESSED: %s", self.desc.key)
 
         try:
@@ -157,5 +172,5 @@ class IntexWA510Button(CoordinatorEntity, ButtonEntity):
             _LOGGER.info("WA510 BUTTON RESULT: %s / result=%s", self.desc.key, result)
             await self.coordinator.async_request_refresh()
 
-        except Exception as err:
-            _LOGGER.exception("WA510 BUTTON ERROR: %s / error=%s", self.desc.key, err)
+        except Exception:
+            _LOGGER.exception("WA510 BUTTON ERROR: %s", self.desc.key)
